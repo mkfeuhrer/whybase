@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -57,7 +59,7 @@ func Parse(src []byte) (Record, error) {
 	meta, rest, err := splitFrontMatter(src)
 	if errors.Is(err, errNoFM) {
 		r.Body = string(rest)
-		return r, nil // legacy MADR parsing lands in its own task
+		return parseLegacy(r)
 	}
 	if err != nil {
 		return r, err
@@ -72,5 +74,33 @@ func Parse(src []byte) (Record, error) {
 		return r, fmt.Errorf("front-matter: %w", serr)
 	}
 	r.Body = string(rest)
+	return r, nil
+}
+
+var (
+	reLegacyTitle  = regexp.MustCompile(`(?m)^#\s*(?:ADR-)?0*(\d+)\s*[.:]\s*(.+?)\s*$`)
+	reLegacyStatus = regexp.MustCompile(`(?m)^Status:\s*(\S+)`)
+	reLegacyDate   = regexp.MustCompile(`(?m)^Date:\s*(\d{4}-\d{2}-\d{2})`)
+)
+
+// parseLegacy fills Number/Title/Status/Date for MADR files without front-matter.
+func parseLegacy(r Record) (Record, error) {
+	m := reLegacyTitle.FindStringSubmatch(r.Body)
+	if m == nil {
+		return r, errors.New("legacy record missing numbered title heading (# 12. Title or # ADR-0012: Title)")
+	}
+	fmt.Sscanf(m[1], "%d", &r.Number)
+	r.Title = strings.TrimSpace(m[2])
+	r.Status = Proposed
+	if sm := reLegacyStatus.FindStringSubmatch(r.Body); sm != nil {
+		st, serr := ValidateStatus(strings.ToLower(sm[1]))
+		if serr != nil {
+			return r, fmt.Errorf("legacy status: %w", serr)
+		}
+		r.Status = st
+	}
+	if dm := reLegacyDate.FindStringSubmatch(r.Body); dm != nil {
+		r.Date = dm[1]
+	}
 	return r, nil
 }
