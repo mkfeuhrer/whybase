@@ -16,7 +16,7 @@ func New(ix *store.Index) *mcp.Server {
 
 	mcp.AddTool(srv, &mcp.Tool{
 		Name:        "search_decisions",
-		Description: "Search architecture decision records by keywords. Returns number, title, status, date.",
+		Description: "Search this repo's architecture decision records by keywords. Use whenever unsure whether an approach was already decided or rejected. Returns number, title, status, date.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
 		Query string `json:"query" jsonschema:"keywords to search for"`
 	}) (*mcp.CallToolResult, any, error) {
@@ -39,7 +39,7 @@ func New(ix *store.Index) *mcp.Server {
 
 	mcp.AddTool(srv, &mcp.Tool{
 		Name:        "get_decision",
-		Description: "Get one full architecture decision record by number.",
+		Description: "Read one full architecture decision record including its rejected alternatives and rationale. Call before acting on any decision found via search_decisions.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
 		Number int `json:"number" jsonschema:"ADR number"`
 	}) (*mcp.CallToolResult, any, error) {
@@ -61,7 +61,7 @@ func New(ix *store.Index) *mcp.Server {
 
 	mcp.AddTool(srv, &mcp.Tool{
 		Name:        "check_paths",
-		Description: "Given file paths you are about to edit, returns governing architecture decisions so you do not violate or re-propose rejected approaches.",
+		Description: "MANDATORY BEFORE ANY CODE EDIT in repos with ADRs: pass the file paths you are about to create or modify; returns governing decisions and their rejected alternatives so you follow precedent instead of re-proposing rejected approaches (e.g. a banned library). Always call first; do not skip even for small changes.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
 		Paths []string `json:"paths" jsonschema:"file paths about to be modified"`
 	}) (*mcp.CallToolResult, any, error) {

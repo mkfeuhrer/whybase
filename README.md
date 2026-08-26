@@ -26,6 +26,7 @@ Requires Go 1.24+. A Homebrew formula will follow the first tagged release.
 ## Quickstart
 
 ```sh
+whybase init                               # teaches your agents to consult decisions (AGENTS.md)
 whybase new "Use Postgres for sessions"     # creates doc/adr/0001-use-postgres-for-sessions.md (proposed)
 cd doc/adr && $EDITOR 0001-*.md             # fill in Decision + Alternatives considered
 whybase list                                # NUMBER STATUS DATE TITLE
@@ -47,7 +48,13 @@ No API key? `--provider mock` writes a sample record offline. Everything except
 
 ```sh
 claude mcp add whybase -- whybase mcp   # Claude Code
+# opencode: add the same command under [mcp] in opencode.json
 ```
+
+Then run `whybase init` in the repo — it writes a managed block into
+`AGENTS.md` instructing agents to call `check_paths` before every edit and to
+never reintroduce rejected alternatives. Without this step, agents only use
+the tools when asked; with it, consultation is the default.
 
 Tools exposed:
 
