@@ -55,13 +55,13 @@ func (a anthropicProvider) Draft(ctx context.Context, p PRData) (string, error) 
 	req.Header.Set("anthropic-version", "2023-06-01")
 	text, status, herr := doJSON(req)
 	if herr != nil {
-		return "", fmt.Errorf("anthropic %s: %w", status, herr)
+		return "", fmt.Errorf("anthropic %d: %w", status, herr)
 	}
 	var resp struct {
 		Content []struct{ Text string } `json:"content"`
 	}
 	if jerr := json.Unmarshal(text, &resp); jerr != nil || len(resp.Content) == 0 {
-		return "", fmt.Errorf("anthropic %s: unexpected response shape (%d bytes)", status, len(text))
+		return "", fmt.Errorf("anthropic %d: unexpected response shape (%d bytes)", status, len(text))
 	}
 	return resp.Content[0].Text, nil
 }
@@ -91,7 +91,7 @@ func (o openAIProvider) Draft(ctx context.Context, p PRData) (string, error) {
 	req.Header.Set("authorization", "Bearer "+o.key)
 	text, status, herr := doJSON(req)
 	if herr != nil {
-		return "", fmt.Errorf("openai %s: %w", status, herr)
+		return "", fmt.Errorf("openai %d: %w", status, herr)
 	}
 	var resp struct {
 		Choices []struct {
@@ -99,7 +99,7 @@ func (o openAIProvider) Draft(ctx context.Context, p PRData) (string, error) {
 		} `json:"choices"`
 	}
 	if jerr := json.Unmarshal(text, &resp); jerr != nil || len(resp.Choices) == 0 {
-		return "", fmt.Errorf("openai %s: unexpected response shape (%d bytes)", status, len(text))
+		return "", fmt.Errorf("openai %d: unexpected response shape (%d bytes)", status, len(text))
 	}
 	return resp.Choices[0].Message.Content, nil
 }
