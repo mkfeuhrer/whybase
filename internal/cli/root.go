@@ -21,7 +21,7 @@ func NewRoot() *cobra.Command {
 		SilenceErrors: true,
 	}
 	c.PersistentFlags().StringVar(&flagRoot, "dir", ".", "repository root")
-	c.AddCommand(newCmd(), listCmd(), supersedeCmd(), draftCmd(), statusCmd())
+	c.AddCommand(newCmd(), listCmd(), supersedeCmd(), draftCmd(), statusCmd(), mcpCmd())
 	return c
 }
 

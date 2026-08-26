@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -64,4 +63,4 @@ func writeRecord(dir string, r adr.Record) (string, error) {
 	return p, nil
 }
 
-var errSilent = errors.New("")
+func logWarn(msg string) { fmt.Fprintln(stderr, "warning:", msg) }
