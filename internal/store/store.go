@@ -54,6 +54,10 @@ func Load(dir string) (*Index, []FileError, error) {
 			ferrs = append(ferrs, FileError{p, perr})
 			continue
 		}
+		if rec.Number <= 0 {
+			ferrs = append(ferrs, FileError{p, fmt.Errorf("record number must be > 0 (got %d)", rec.Number)})
+			continue
+		}
 		if first, dup := paths[rec.Number]; dup {
 			ferrs = append(ferrs, FileError{p, fmt.Errorf("duplicate number %d (already loaded from %s)", rec.Number, filepath.Base(first))})
 			continue

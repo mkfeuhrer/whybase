@@ -68,9 +68,6 @@ func Parse(src []byte) (Record, error) {
 	if uerr := yaml.Unmarshal(meta, &r); uerr != nil {
 		return r, fmt.Errorf("front-matter: %w", uerr)
 	}
-	if r.Number <= 0 {
-		return r, errors.New("front-matter: number must be > 0")
-	}
 	if _, serr := ValidateStatus(string(r.Status)); serr != nil {
 		return r, fmt.Errorf("front-matter: %w", serr)
 	}

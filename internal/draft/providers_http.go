@@ -79,7 +79,7 @@ func (o openAIProvider) Draft(ctx context.Context, p PRData) (string, error) {
 		return "", err
 	}
 	body, _ := json.Marshal(map[string]interface{}{
-		"model": modelOpenAI,
+		"model":                 modelOpenAI,
 		"max_completion_tokens": 4000,
 		"messages":              []map[string]string{{"role": "user", "content": prompt}},
 	})

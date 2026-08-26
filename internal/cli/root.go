@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -20,13 +21,15 @@ func NewRoot() *cobra.Command {
 		SilenceErrors: true,
 	}
 	c.PersistentFlags().StringVar(&flagRoot, "dir", ".", "repository root")
-	c.AddCommand(newCmd(), listCmd(), supersedeCmd())
+	c.AddCommand(newCmd(), listCmd(), supersedeCmd(), draftCmd(), statusCmd())
 	return c
 }
 
 func Execute() error {
 	if err := NewRoot().Execute(); err != nil {
-		fmt.Fprintln(stderr, "error:", err)
+		if !errors.Is(err, ErrIntegrity) {
+			fmt.Fprintln(stderr, "error:", err)
+		}
 		return err
 	}
 	return nil

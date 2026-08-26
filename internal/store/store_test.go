@@ -128,3 +128,22 @@ func TestDuplicateNumbersReported(t *testing.T) {
 		t.Fatalf("want records 1 and 2 indexed, got %d", len(ix.Ordered))
 	}
 }
+
+func TestZeroNumberRejectedAtLoad(t *testing.T) {
+	dir := fixtureRepo(t, map[string]string{"0000-draft.md": `---
+number: 0
+title: "x"
+status: proposed
+date: "2026-01-01"
+---
+
+# x
+`})
+	_, ferrs, err := Load(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ferrs) != 1 || ferrs[0].Err == nil || ferrs[0].Number() != 0 {
+		t.Fatalf("zero-number file must be a FileError, got %+v", ferrs)
+	}
+}

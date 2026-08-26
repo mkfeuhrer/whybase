@@ -61,11 +61,14 @@ func TestParseUnterminatedFrontmatter(t *testing.T) {
 	}
 }
 
-func TestParseZeroNumber(t *testing.T) {
+func TestParseZeroNumberAllowedForDrafts(t *testing.T) {
 	src := strings.Replace(fmDoc, "number: 7", "number: 0", 1)
-	_, err := Parse([]byte(src))
-	if err == nil || !strings.Contains(err.Error(), "number must be > 0") {
-		t.Fatalf("want number error, got %v", err)
+	r, err := Parse([]byte(src))
+	if err != nil {
+		t.Fatalf("parse should accept number 0 (draft stage): %v", err)
+	}
+	if r.Number != 0 {
+		t.Fatal("number lost")
 	}
 }
 
