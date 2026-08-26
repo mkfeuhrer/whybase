@@ -37,6 +37,7 @@ type Record struct {
 	SupersededBy []int    `yaml:"superseded_by,omitempty"`
 	Tags         []string `yaml:"tags,omitempty"`
 	Body         string   `yaml:"-"`
+	Path         string   `yaml:"-"` // source file path, set by store.Load
 }
 
 var errNoFM = errors.New("no front-matter")
